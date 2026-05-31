@@ -127,60 +127,6 @@ export default function Page() {
         </p>
       </header>
 
-      {/* ============ CRIBSHEET ============ */}
-      <section className="mb-12">
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold">State cribsheet</h2>
-            <p className="text-sm text-zinc-500">Click a column header to sort. Filter by state name or code.</p>
-          </div>
-          <input
-            type="text"
-            placeholder="Filter by name or code..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none sm:w-72"
-          />
-        </div>
-
-        <div className="overflow-x-auto rounded-lg border border-zinc-800">
-          <table className="min-w-full divide-y divide-zinc-800 text-sm">
-            <thead className="bg-zinc-900/60 text-left text-xs uppercase tracking-wide text-zinc-400">
-              <tr>
-                <Th onClick={() => clickSort("name")} active={sortKey === "name"} dir={sortDir}>State</Th>
-                <Th onClick={() => clickSort("incomeTax")} active={sortKey === "incomeTax"} dir={sortDir} align="right">Income tax (top)</Th>
-                <Th onClick={() => clickSort("salesTax")} active={sortKey === "salesTax"} dir={sortDir} align="right">Sales tax (combined)</Th>
-                <Th onClick={() => clickSort("propertyTax")} active={sortKey === "propertyTax"} dir={sortDir} align="right">Property tax (effective)</Th>
-                <Th onClick={() => clickSort("col")} active={sortKey === "col"} dir={sortDir} align="right">COL index</Th>
-                <Th onClick={() => clickSort("tier")} active={sortKey === "tier"} dir={sortDir} align="center">Burden</Th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-900">
-              {filtered.map((s) => (
-                <tr key={s.code} className="hover:bg-zinc-900/40">
-                  <td className="px-3 py-2 font-medium">
-                    <span className="text-zinc-400 text-xs mr-2">{s.code}</span>
-                    {s.name}
-                  </td>
-                  <td className="px-3 py-2 text-right tabular-nums">{s.incomeTax.toFixed(2)}%</td>
-                  <td className="px-3 py-2 text-right tabular-nums">{s.salesTax.toFixed(2)}%</td>
-                  <td className="px-3 py-2 text-right tabular-nums">{s.propertyTax.toFixed(2)}%</td>
-                  <td className="px-3 py-2 text-right tabular-nums">{s.col.toFixed(1)}</td>
-                  <td className="px-3 py-2 text-center">
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${tierClass(s.tier)}`}>{s.tier}</span>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-3 py-6 text-center text-zinc-500">No states match that filter.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
       {/* ============ INCOME CALCULATOR ============ */}
       <section className="mb-12">
         <div className="mb-4">
@@ -286,6 +232,60 @@ export default function Page() {
             <Stat label="Net monthly income" value={`$${fmt(netMonthly)}`} sub="From calculator above" />
             <Stat label="Annual disposable" value={`${disposable < 0 ? "-$" : "$"}${fmt(Math.abs(disposable * 12))}`} sub="12 x monthly disposable" />
           </div>
+        </div>
+      </section>
+
+      {/* ============ CRIBSHEET ============ */}
+      <section className="mb-12">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">State cribsheet</h2>
+            <p className="text-sm text-zinc-500">Click a column header to sort. Filter by state name or code.</p>
+          </div>
+          <input
+            type="text"
+            placeholder="Filter by name or code..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none sm:w-72"
+          />
+        </div>
+
+        <div className="overflow-x-auto rounded-lg border border-zinc-800">
+          <table className="min-w-full divide-y divide-zinc-800 text-sm">
+            <thead className="bg-zinc-900/60 text-left text-xs uppercase tracking-wide text-zinc-400">
+              <tr>
+                <Th onClick={() => clickSort("name")} active={sortKey === "name"} dir={sortDir}>State</Th>
+                <Th onClick={() => clickSort("incomeTax")} active={sortKey === "incomeTax"} dir={sortDir} align="right">Income tax (top)</Th>
+                <Th onClick={() => clickSort("salesTax")} active={sortKey === "salesTax"} dir={sortDir} align="right">Sales tax (combined)</Th>
+                <Th onClick={() => clickSort("propertyTax")} active={sortKey === "propertyTax"} dir={sortDir} align="right">Property tax (effective)</Th>
+                <Th onClick={() => clickSort("col")} active={sortKey === "col"} dir={sortDir} align="right">COL index</Th>
+                <Th onClick={() => clickSort("tier")} active={sortKey === "tier"} dir={sortDir} align="center">Burden</Th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-900">
+              {filtered.map((s) => (
+                <tr key={s.code} className="hover:bg-zinc-900/40">
+                  <td className="px-3 py-2 font-medium">
+                    <span className="text-zinc-400 text-xs mr-2">{s.code}</span>
+                    {s.name}
+                  </td>
+                  <td className="px-3 py-2 text-right tabular-nums">{s.incomeTax.toFixed(2)}%</td>
+                  <td className="px-3 py-2 text-right tabular-nums">{s.salesTax.toFixed(2)}%</td>
+                  <td className="px-3 py-2 text-right tabular-nums">{s.propertyTax.toFixed(2)}%</td>
+                  <td className="px-3 py-2 text-right tabular-nums">{s.col.toFixed(1)}</td>
+                  <td className="px-3 py-2 text-center">
+                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${tierClass(s.tier)}`}>{s.tier}</span>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-3 py-6 text-center text-zinc-500">No states match that filter.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </section>
 
