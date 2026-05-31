@@ -7,6 +7,7 @@ import {
   federalTax,
   ficaTax,
   stateIncomeTax,
+  type FilingStatus,
   type StateRow,
   type Tier,
 } from "@/lib/states";
@@ -75,11 +76,12 @@ export default function Page() {
   // --- Income calculator state ---
   const [grossStr, setGrossStr] = useState("100000");
   const [calcStateCode, setCalcStateCode] = useState("TX");
+  const [filingStatus, setFilingStatus] = useState<FilingStatus>("single");
 
   const gross = Math.max(0, Number(grossStr.replace(/[^0-9.]/g, "")) || 0);
   const calcState = enriched.find((s) => s.code === calcStateCode) ?? enriched[0];
 
-  const fedTax = federalTax(gross);
+  const fedTax = federalTax(gross, filingStatus);
   const stTax = stateIncomeTax(gross, calcState.incomeTax);
   const fica = ficaTax(gross);
   const netAnnual = Math.max(0, gross - fedTax - stTax - fica);
@@ -183,12 +185,31 @@ export default function Page() {
       <section className="mb-12">
         <div className="mb-4">
           <h2 className="text-lg font-semibold">Income calculator</h2>
-          <p className="text-sm text-zinc-500">2024 federal brackets, single filer, $14,600 standard deduction. State effective rate approximated as 60 percent of top marginal.</p>
+          <p className="text-sm text-zinc-500">2025 federal brackets (IRS Rev. Proc. 2024-40). Standard deduction $15,000 single / $30,000 married filing jointly. State effective rate approximated as 60 percent of top marginal.</p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
           {/* Sticky inputs */}
           <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-900/40 p-5 lg:sticky lg:top-4 lg:self-start">
+            <Field label="Filing status">
+              <div className="inline-flex w-full overflow-hidden rounded-md ring-1 ring-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setFilingStatus("single")}
+                  className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${filingStatus === "single" ? "bg-zinc-200 text-zinc-900" : "bg-zinc-900 text-zinc-400 hover:text-zinc-200"}`}
+                >
+                  Single
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilingStatus("mfj")}
+                  className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${filingStatus === "mfj" ? "bg-zinc-200 text-zinc-900" : "bg-zinc-900 text-zinc-400 hover:text-zinc-200"}`}
+                >
+                  Married filing jointly
+                </button>
+              </div>
+            </Field>
+
             <Field label="Gross annual income ($)">
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">$</span>
@@ -270,11 +291,14 @@ export default function Page() {
 
       <footer className="mt-16 border-t border-zinc-900 pt-6 text-xs text-zinc-500">
         <p>
-          Tax math is approximate. Single filer, standard deduction only. Does not account for itemized deductions, dependents,
-          HSA / 401k contributions, AMT, capital gains, NIIT, or local payroll taxes outside FICA. State income tax modeled at 60 percent
-          of top marginal rate on income above $5,000 to approximate a realistic effective rate. New Hampshire and Tennessee shown as 0 percent on wages
-          (both tax interest and dividends only). Data sources: Tax Foundation (2024 rates) and MERIC Q4 2023 cost of living index. Numbers shift annually,
-          treat this as a rough cribsheet, not advice.
+          Tax math is approximate. Standard deduction only (single or MFJ). Does not account for itemized deductions, dependents,
+          HSA / 401k contributions, AMT, capital gains, NIIT, the Social Security wage cap above $176,100, or local payroll taxes outside FICA.
+          State income tax modeled at 60 percent of top marginal rate on income above a $5,000 state standard deduction to approximate a realistic effective rate.
+          New Hampshire repealed its interest / dividends tax Jan 1 2025 (now 0 percent on all individual income). Tennessee is 0 percent on wages.
+          Washington has a 7 percent capital gains tax only, treated here as 0 percent on wages.
+          Data sources: Tax Foundation State Individual Income Tax Rates (effective Jan 1 2025), State and Local Sales Tax Rates Midyear 2025 (as of Jul 1 2025),
+          Property Taxes by State (2024 ACS 5-year), and MERIC Cost of Living Index (2025 annual average).
+          Federal brackets per IRS Rev. Proc. 2024-40. Last data refresh: 2026-05-31. Numbers shift annually, treat this as a rough cribsheet, not advice.
         </p>
       </footer>
     </main>
